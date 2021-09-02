@@ -1,0 +1,3 @@
+(executable
+ (name etch)
+ (modes byte exe))
