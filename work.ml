@@ -35,12 +35,14 @@ let rec subst ty name body =
 
 let rec work expr =
   let work2 e1 e2 =
-    let r1 = work e1 in
-    if r1 = e1 then (r1, work e2) else (r1, e2)
+    match e1 with Res _ -> (e1, work e2) | _ -> (work e1, e2)
   in
   let work3 e1 e2 e3 =
-    let r1, r2 = work2 e1 e2 in
-    if (r1, r2) = (e1, e2) then (r1, r2, work e3) else (r1, r2, e3)
+    match (e1, e2) with
+    | Res _, Res _ -> (e1, e2, work e3)
+    | _ ->
+        let e1, e2 = work2 e1 e2 in
+        (e1, e2, e3)
   in
   match expr with
   | Fun (_, pTy, Res resTy) -> Res (FunTy (pTy, resTy))
