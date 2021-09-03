@@ -1,5 +1,8 @@
 open Node
 
+module Node = Node
+module WellFormed = WellFormed
+
 (* type meta = 
 
 let lift f = fun meta -> f meta.ty *)
