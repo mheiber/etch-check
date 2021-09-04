@@ -5,12 +5,12 @@ let print_step step =
   print_endline step_str;
   print_endline "----------------"
 
-let run example =
+let check example =
   example |> Lexing.from_string |> Etch.parse |> Etch.check
   |> List.iter print_step
 
 let%expect_test _ =
-  run "3";
+  check "3";
   [%expect {|
     3
     ----------------
@@ -18,7 +18,7 @@ let%expect_test _ =
     ---------------- |}]
 
 let%expect_test _ =
-  run "let x := 2 in x";
+  check "let x := 2 in x";
   [%expect
     {|
     (let x := 2 in x)
@@ -29,7 +29,7 @@ let%expect_test _ =
     ---------------- |}]
 
 let%expect_test _ =
-  run "let x := 2 in x + x";
+  check "let x := 2 in x + x";
   [%expect
     {|
     (let x := 2 in (x + x))
@@ -42,22 +42,22 @@ let%expect_test _ =
     ---------------- |}]
 
 let%expect_test _ =
-  run "let x := 2 in x + y";
+  check "let x := 2 in x + true";
   [%expect
     {|
-    (let x := 2 in (x + y))
+    (let x := 2 in (x + true))
     ----------------
-    (let x := Int in (x + y))
+    (let x := Int in (x + true))
     ----------------
-    (Int + y)
+    (Int + true)
     ----------------
-    (Int + (Error: Unbound var y))
+    (Int + Bool)
     ----------------
-    (Error: expected (Error: Unbound var y), got Int)
+    (Error: expected Bool, got Int)
     ---------------- |}]
 
 let%expect_test _ =
-  run "if true then true else false";
+  check "if true then true else false";
   [%expect
     {|
       (if true then true else false)
@@ -72,7 +72,7 @@ let%expect_test _ =
       ---------------- |}]
 
 let%expect_test _ =
-  run "let x := 2 in (if ((x + x) = 4) then x else 2)";
+  check "let x := 2 in (if ((x + x) = 4) then x else 2)";
   [%expect
     {|
     (let x := 2 in (if ((x + x) = 4) then x else 2))
@@ -93,7 +93,7 @@ let%expect_test _ =
     ---------------- |}]
 
 let%expect_test "neg" =
-  run "3 = true";
+  check "3 = true";
   [%expect
     {|
     (3 = true)
@@ -106,7 +106,7 @@ let%expect_test "neg" =
     ---------------- |}]
 
 let%expect_test "neg" =
-  run "true = true";
+  check "true = true";
   [%expect
     {|
     (true = true)
@@ -119,7 +119,7 @@ let%expect_test "neg" =
     ---------------- |}]
 
 let%expect_test "pos" =
-  run "2 = 5";
+  check "2 = 5";
   [%expect
     {|
     (2 = 5)
@@ -132,7 +132,7 @@ let%expect_test "pos" =
     ---------------- |}]
 
 let%expect_test "neg" =
-  run "if 3 then true else true";
+  check "if 3 then true else true";
   [%expect
     {|
     (if 3 then true else true)
@@ -147,20 +147,24 @@ let%expect_test "neg" =
     ---------------- |}]
 
 let%expect_test "neg" =
-  run "2 + true";
+  check "(1 + true) + 3";
   [%expect
     {|
-    (2 + true)
+    ((1 + true) + 3)
     ----------------
-    (Int + true)
+    ((Int + true) + 3)
     ----------------
-    (Int + Bool)
+    ((Int + Bool) + 3)
     ----------------
-    (Error: expected Bool, got Int)
+    ((Error: expected Bool, got Int) + 3)
+    ----------------
+    ((Error: expected Bool, got Int) + Int)
+    ----------------
+    (Error: expected (Error: expected Bool, got Int), got Int)
     ---------------- |}]
 
 let%expect_test "neg" =
-  run "true + 2";
+  check "true + 2";
   [%expect
     {|
     (true + 2)
@@ -173,7 +177,7 @@ let%expect_test "neg" =
     ---------------- |}]
 
 let%expect_test "neg" =
-  run "2 true";
+  check "2 true";
   [%expect
     {|
     (2 true)
@@ -183,4 +187,104 @@ let%expect_test "neg" =
     (Int Bool)
     ----------------
     (Error: expected fun type, got Int)
+    ---------------- |}]
+
+let%expect_test "neg" =
+  check "if ((2 + 2) = 4) then (if true then true else true) else (1 = true)";
+  [%expect
+    {|
+    (if ((2 + 2) = 4) then (if true then true else true) else (1 = true))
+    ----------------
+    (if ((Int + 2) = 4) then (if true then true else true) else (1 = true))
+    ----------------
+    (if ((Int + Int) = 4) then (if true then true else true) else (1 = true))
+    ----------------
+    (if (Int = 4) then (if true then true else true) else (1 = true))
+    ----------------
+    (if (Int = Int) then (if true then true else true) else (1 = true))
+    ----------------
+    (if Bool then (if true then true else true) else (1 = true))
+    ----------------
+    (if Bool then (if Bool then true else true) else (1 = true))
+    ----------------
+    (if Bool then (if Bool then Bool else true) else (1 = true))
+    ----------------
+    (if Bool then (if Bool then Bool else Bool) else (1 = true))
+    ----------------
+    (if Bool then Bool else (1 = true))
+    ----------------
+    (if Bool then Bool else (Int = true))
+    ----------------
+    (if Bool then Bool else (Int = Bool))
+    ----------------
+    (if Bool then Bool else (Error: expected Bool, got Int))
+    ----------------
+    (Error: expected Bool, got Int)
+    ---------------- |}]
+
+let%expect_test "neg" =
+  check "let f := (3 + true) in f 2";
+  [%expect
+    {|
+      ((let f := (3 + true) in f) 2)
+      ----------------
+      ((let f := (Int + true) in f) 2)
+      ----------------
+      ((let f := (Int + Bool) in f) 2)
+      ----------------
+      ((let f := (Error: expected Bool, got Int) in f) 2)
+      ----------------
+      ((Error: expected Bool, got Int) 2)
+      ----------------
+      ((Error: expected Bool, got Int) Int)
+      ----------------
+      (Error: expected Bool, got Int)
+      ---------------- |}]
+
+let%expect_test "" =
+  check "(fun x : Int := 2 = x) 1";
+  [%expect
+    {|
+    ((fun x : Int := (2 = x)) 1)
+    ----------------
+    ((fun _ : Int := (2 = Int)) 1)
+    ----------------
+    ((fun _ : Int := (Int = Int)) 1)
+    ----------------
+    ((fun _ : Int := Bool) 1)
+    ----------------
+    ((Int -> Bool) 1)
+    ----------------
+    ((Int -> Bool) Int)
+    ----------------
+    Bool
+    ---------------- |}]
+
+let%expect_test "" =
+  check "(fun x : Int := fun y : Int := 2 = (x + y)) 1 2";
+  [%expect
+    {|
+    (((fun x : Int := (fun y : Int := (2 = (x + y)))) 1) 2)
+    ----------------
+    (((fun _ : Int := (fun y : Int := (2 = (Int + y)))) 1) 2)
+    ----------------
+    (((fun _ : Int := (fun _ : Int := (2 = (Int + Int)))) 1) 2)
+    ----------------
+    (((fun _ : Int := (fun _ : Int := (Int = (Int + Int)))) 1) 2)
+    ----------------
+    (((fun _ : Int := (fun _ : Int := (Int = Int))) 1) 2)
+    ----------------
+    (((fun _ : Int := (fun _ : Int := Bool)) 1) 2)
+    ----------------
+    (((fun _ : Int := (Int -> Bool)) 1) 2)
+    ----------------
+    (((Int -> (Int -> Bool)) 1) 2)
+    ----------------
+    (((Int -> (Int -> Bool)) Int) 2)
+    ----------------
+    ((Int -> Bool) 2)
+    ----------------
+    ((Int -> Bool) Int)
+    ----------------
+    Bool
     ---------------- |}]

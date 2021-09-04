@@ -5,12 +5,12 @@ let print_step step =
   print_endline step_str;
   print_endline "----------------"
 
-let run example =
+let parse example =
   example |> Lexing.from_string |> Etch.parse |> Etch.check
   |> List.iter print_step
 
 let%expect_test "neg" =
-  run "let x := 2 in let x := 3 in x";
+  parse "let x := 2 in let x := 3 in x";
   [%expect
     {|
     (let x := 2 in (Error: x is already bound, you must use a new name))
@@ -21,7 +21,7 @@ let%expect_test "neg" =
     ---------------- |}]
 
 let%expect_test "pos" =
-  run "let x := 2 in let z := 3 in x";
+  parse "let x := 2 in let z := 3 in x";
   [%expect
     {|
     (let x := 2 in (let z := 3 in x))
@@ -36,7 +36,7 @@ let%expect_test "pos" =
     ---------------- |}]
 
 let%expect_test "pos" =
-  run "let add2 := fun x : Int := x + 2 in let x := 3 in (add2 x)";
+  parse "let add2 := fun x : Int := x + 2 in let x := 3 in (add2 x)";
   [%expect
     {|
     (let add2 := (fun x : Int := (x + 2)) in (let x := 3 in (add2 x)))
@@ -59,7 +59,7 @@ let%expect_test "pos" =
     ---------------- |}]
 
 let%expect_test "neg" =
-  run "let add2 := fun x : Int := x + 2 in let add2 := 3 in (add2 add2)";
+  parse "let add2 := fun x : Int := x + 2 in let add2 := 3 in (add2 add2)";
   [%expect
     {|
     (let add2 := (fun x : Int := (x + 2)) in (Error: add2 is already bound, you must use a new name))
@@ -76,7 +76,7 @@ let%expect_test "neg" =
     ---------------- |}]
 
 let%expect_test "pos" =
-  run {| fun x : Int := fun y : Int := true |};
+  parse {| fun x : Int := fun y : Int := true |};
   [%expect
     {|
     (fun x : Int := (fun y : Int := true))
@@ -93,7 +93,7 @@ let%expect_test "pos" =
     ---------------- |}]
 
 let%expect_test "neg" =
-  run {| fun x : Int := fun x : Int := true |};
+  parse {| fun x : Int := fun x : Int := true |};
   [%expect
     {|
     (fun x : Int := (Error: x is already bound, you must use a new name))
