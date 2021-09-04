@@ -4,4 +4,4 @@ coverage :
 	rm -rf _build/coverage \
 		&& dune runtest --instrument-with bisect_ppx --force \
 		&& bisect-ppx-report html \
-		&& open ./_coverage/index.html # sorry, non-mac users
+		&& open ./_coverage/index.html

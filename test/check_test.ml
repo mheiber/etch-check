@@ -91,3 +91,96 @@ let%expect_test _ =
     ----------------
     Int
     ---------------- |}]
+
+let%expect_test "neg" =
+  run "3 = true";
+  [%expect
+    {|
+    (3 = true)
+    ----------------
+    (Int = true)
+    ----------------
+    (Int = Bool)
+    ----------------
+    (Error: expected Bool, got Int)
+    ---------------- |}]
+
+let%expect_test "neg" =
+  run "true = true";
+  [%expect
+    {|
+    (true = true)
+    ----------------
+    (Bool = true)
+    ----------------
+    (Bool = Bool)
+    ----------------
+    (Error: expected Bool, got Int)
+    ---------------- |}]
+
+let%expect_test "pos" =
+  run "2 = 5";
+  [%expect
+    {|
+    (2 = 5)
+    ----------------
+    (Int = 5)
+    ----------------
+    (Int = Int)
+    ----------------
+    Bool
+    ---------------- |}]
+
+let%expect_test "neg" =
+  run "if 3 then true else true";
+  [%expect
+    {|
+    (if 3 then true else true)
+    ----------------
+    (if Int then true else true)
+    ----------------
+    (if Int then Bool else true)
+    ----------------
+    (if Int then Bool else Bool)
+    ----------------
+    (Error: expected Bool, got Int)
+    ---------------- |}]
+
+let%expect_test "neg" =
+  run "2 + true";
+  [%expect
+    {|
+    (2 + true)
+    ----------------
+    (Int + true)
+    ----------------
+    (Int + Bool)
+    ----------------
+    (Error: expected Bool, got Int)
+    ---------------- |}]
+
+let%expect_test "neg" =
+  run "true + 2";
+  [%expect
+    {|
+    (true + 2)
+    ----------------
+    (Bool + 2)
+    ----------------
+    (Bool + Int)
+    ----------------
+    (Error: expected Bool, got Int)
+    ---------------- |}]
+
+let%expect_test "neg" =
+  run "2 true";
+  [%expect
+    {|
+    (2 true)
+    ----------------
+    (Int true)
+    ----------------
+    (Int Bool)
+    ----------------
+    (Error: expected fun type, got Int)
+    ---------------- |}]

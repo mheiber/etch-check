@@ -8,9 +8,10 @@ let well_formed expr =
           Printf.sprintf "%s is already bound, you must use a new name" name
         in
         Res (ErrTy msg)
-    | Fun (None, paramTy, body) ->
-        let body = wf names body in
-        Fun (None, paramTy, body)
+    | Fun (None, _pTy, _body) ->
+        failwith
+          "unreachable: the surface language should not allow funs with \
+           unnamed params"
     | Fun (Some paramName, paramTy, body) ->
         let names = StrSet.add paramName names in
         let body = wf names body in
