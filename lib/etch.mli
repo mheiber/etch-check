@@ -1,3 +1,2 @@
 module Node = Node
-module WellFormed = WellFormed
-val work : Node.expr -> Node.expr
+val check : Node.expr -> Node.expr list

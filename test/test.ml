@@ -1,16 +1,13 @@
 open Etch.Node
 
-let rec gather = function
-  | Res _ as res -> [ res ]
-  | res -> res :: gather (Etch.work res)
-
 let print_step step =
   let step_str = show_expr step in
   print_endline step_str;
   print_endline "----------------"
 
 let run example =
-  List.iter print_step (gather @@ Etch.WellFormed.well_formed example)
+    List.iter print_step @@
+    Etch.check example
 
 let%expect_test _ =
   run @@ Int 3;
