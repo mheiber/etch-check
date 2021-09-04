@@ -1,0 +1,6 @@
+(library
+ (name foo)
+ (inline_tests)
+ (preprocess
+  (pps ppx_inline_test ppx_expect))
+ (libraries ppx_expect.evaluator etch))

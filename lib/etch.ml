@@ -3,9 +3,6 @@ open Node
 module Node = Node
 module WellFormed = WellFormed
 
-(* type meta = 
-
-let lift f = fun meta -> f meta.ty *)
 
 let expected exp = function
   | ErrTy _ as got -> Res got
