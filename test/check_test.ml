@@ -160,7 +160,7 @@ let%expect_test "neg" =
     ----------------
     ((Error: expected Bool, got Int) + Int)
     ----------------
-    (Error: expected (Error: expected Bool, got Int), got Int)
+    (Error: expected Bool, got Int)
     ---------------- |}]
 
 let%expect_test "neg" =

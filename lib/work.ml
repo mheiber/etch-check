@@ -2,9 +2,11 @@ open Node
 module Node = Node
 module WellFormed = WellFormed
 
-let expected exp = function
-  | ErrTy _ as got -> Res got
-  | got ->
+let expected exp got =
+  match (exp, got) with
+  | ErrTy _, _ -> Res exp
+  | _, ErrTy _ -> Res got
+  | _ ->
       let msg =
         Printf.sprintf "expected %s, got %s" (show_ty exp) (show_ty got)
       in
