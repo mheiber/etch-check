@@ -1,8 +1,6 @@
 open Node
-
 module Node = Node
 module WellFormed = WellFormed
-
 
 let expected exp = function
   | ErrTy _ as got -> Res got

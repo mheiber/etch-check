@@ -21,17 +21,17 @@ let rec show_ty = function
 and show_expr = function
   | Var s -> s
   | Fun (None, pTy, e) ->
-      Printf.sprintf "lambda _ : %s. %s" (show_ty pTy) (show_expr e)
+      Printf.sprintf "(fun _ : %s := %s)" (show_ty pTy) (show_expr e)
   | Fun (Some p, pTy, e) ->
-      Printf.sprintf "lambda %s : %s. %s" p (show_ty pTy) (show_expr e)
+      Printf.sprintf "(fun %s : %s := %s)" p (show_ty pTy) (show_expr e)
   | Let (x, e1, e2) ->
-      Printf.sprintf "let %s = %s in %s" x (show_expr e1) (show_expr e2)
-  | App (e1, e2) -> Printf.sprintf "%s %s" (show_expr e1) (show_expr e2)
+      Printf.sprintf "(let %s := %s in %s)" x (show_expr e1) (show_expr e2)
+  | App (e1, e2) -> Printf.sprintf "(%s %s)" (show_expr e1) (show_expr e2)
   | Int n -> Printf.sprintf "%d" n
   | Bool true -> "true"
   | Bool false -> "false"
   | If (e1, e2, e3) ->
-      Printf.sprintf "if %s then %s else %s" (show_expr e1) (show_expr e2)
+      Printf.sprintf "(if %s then %s else %s)" (show_expr e1) (show_expr e2)
         (show_expr e3)
   | Plus (e1, e2) -> Printf.sprintf "(%s + %s)" (show_expr e1) (show_expr e2)
   | Eq (e1, e2) -> Printf.sprintf "(%s = %s)" (show_expr e1) (show_expr e2)

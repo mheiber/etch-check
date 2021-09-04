@@ -1,4 +1,8 @@
 (library
- (public_name etch)
- )
+ (public_name etch))
 
+(menhir
+ (modules parser))
+
+(ocamllex
+ (modules lexer))

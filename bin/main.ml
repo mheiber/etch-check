@@ -5,7 +5,8 @@ let print_step step =
   print_endline step_str;
   print_endline "----------------"
 
-let example =
-  Let ("x", Int 2, If (Eq (Plus (Var "x", Var "x"), Int 4), Var "x", Int 2))
+let run example =
+  example |> Lexing.from_string |> Etch.parse |> Etch.check
+  |> List.iter print_step
 
-let _ = List.iter print_step @@ Etch.check example
+let _ = run "let x := 2 in (if ((x + x) = 4) then x else 2)"
