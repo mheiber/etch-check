@@ -42,4 +42,8 @@ rule read =
     | "Bool" { BOOL_TY }
     | "Int" { INT_TY }
     | id { VAR (Lexing.lexeme lexbuf)}
+    | _ as c { 
+      let msg = Printf.sprintf "unexpected char '%c'" c in
+        raise (SyntaxError msg)
+    }
     | eof { EOF }

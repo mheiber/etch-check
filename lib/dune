@@ -1,6 +1,7 @@
 (library
  (public_name etch)
-  (instrumentation (backend bisect_ppx)))
+ (instrumentation
+  (backend bisect_ppx)))
 
 (menhir
  (modules parser))
