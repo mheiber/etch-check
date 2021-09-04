@@ -3,4 +3,4 @@
  (inline_tests)
  (preprocess
   (pps ppx_inline_test ppx_expect))
- (libraries ppx_expect.evaluator etch))
+ (libraries ppx_expect.evaluator bisect_ppx etch))
